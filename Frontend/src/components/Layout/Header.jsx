@@ -222,7 +222,7 @@ const Header = ({ activeHeading }) => {
                 src="/src/assetss/shop-logo.png"
                 className="mt-3 cursor-pointer"
                 alt="my-shop-logo"
-                style={{ width: "6      0px", height: "10", filter: "brightness(0) grayScale(25%) contrast(0,9)" }}
+                style={{ width: "6      0px", height: "50px", filter: "brightness(0) grayScale(25%) contrast(0,9)" }}
               />
             </Link>
           </div>

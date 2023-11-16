@@ -229,7 +229,7 @@ export const categoriesData = [
     title: "Gifts",
     subTitle: "",
     image_Url:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP8vvN5lxqHiH-_yiP5xpxkNjRETK0YA4wzIgcKDTWF7yglXrPIOhPDsiSy2ZhdPOn42k&usqp=CAU",
+      "https://img.freepik.com/free-photo/gift-box-isolated-white_74190-2837.jpg?size=626&ext=jpg&ga=GA1.1.1836385983.1700096019&semt=sph",
   },
   {
     id: 7,
@@ -253,11 +253,26 @@ export const categoriesData = [
   },
   {
     id: 10,
+    title: "Books and Stationery",
+    subTitle: "",
+    image_Url:
+      "https://previews.123rf.com/images/serezniy/serezniy1108/serezniy110800933/10310169-bright-stationery-and-books-isolated-on-white.jpg",
+  },
+  {
+    id: 11,
+    title: "Home and Furniture",
+    subTitle: "",
+    image_Url:
+      "https://img.freepik.com/free-vector/home-furniture-set_74855-15461.jpg?size=626&ext=jpg&ga=GA1.1.1826414947.1699920000&semt=ais",
+  },
+  {
+    id: 12,
     title: "Others",
     subTitle: "",
     image_Url:
       "https://searchspring.com/wp-content/uploads/2022/10/Hero-Image-Platform-Others-2.png",
   },
+  
 ];
 
 // product Data
