@@ -2,11 +2,15 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import { server } from "../server";
 
 const ActivationPage = () => {
-  const { activation_token } = useParams();
+  // const { activation_token } = useParams();
+  const location = useLocation();
+  const activation_token = new URLSearchParams(location.search).get('activation_token');
   const [error, setError] = useState(false);
+
 
   useEffect(() => {
     if (activation_token) {
@@ -24,7 +28,7 @@ const ActivationPage = () => {
       };
       sendRequest();
     }
-  }, []);
+  }, [activation_token]);
 
   return (
     <div
