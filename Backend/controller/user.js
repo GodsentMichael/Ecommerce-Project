@@ -240,44 +240,40 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
 
 
 // update user addresses
-// router.put(
-//   "/update-user-addresses",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const user = await User.findById(req.user.id);
+ exports.updateUserAddresses = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
 
-//       const sameTypeAddress = user.addresses.find(
-//         (address) => address.addressType === req.body.addressType
-//       );
-//       if (sameTypeAddress) {
-//         return next(
-//           new ErrorHandler(`${req.body.addressType} address already exists`)
-//         );
-//       }
+      const sameTypeAddress = user.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(`${req.body.addressType} address already exists`)
+        );
+      }
 
-//       const existsAddress = user.addresses.find(
-//         (address) => address._id === req.body._id
-//       );
+      const addressExists = user.addresses.find(
+        (address) => address._id === req.body._id
+      );
 
-//       if (existsAddress) {
-//         Object.assign(existsAddress, req.body);
-//       } else {
-//         // add the new address to the array
-//         user.addresses.push(req.body);
-//       }
+      if (addressExists) {
+        Object.assign(addressExists, req.body);
+      } else {
+        // THEN ADD THE NEW ADDRESS TO THE ARRAY.
+        user.addresses.push(req.body);
+      }
 
-//       await user.save();
+      await user.save();
 
-//       res.status(200).json({
-//         success: true,
-//         user,
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  });
 
 // delete user address
 // router.delete(
