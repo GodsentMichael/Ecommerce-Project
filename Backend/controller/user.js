@@ -10,7 +10,7 @@ const sendToken = require("../utils/jwtToken");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 // create user
-exports.registerUser = async (req, res, next) => {
+exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name, email, password, avatar } = req.body;
     console.log("REQ BODY=>", req.body)
@@ -56,7 +56,7 @@ exports.registerUser = async (req, res, next) => {
     console.error("Error=>", error);
     return next(new ErrorHandler(error.message, 400));
   }
-};
+});
 
 // create activation token
 const createActivationToken = (user) => {
@@ -66,191 +66,178 @@ const createActivationToken = (user) => {
 };
 
 // activate user
-// router.post(
-//   "/activation",
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const { activation_token } = req.body;
 
-//       const newUser = jwt.verify(
-//         activation_token,
-//         process.env.ACTIVATION_SECRET
-//       );
+exports.activateUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { activation_token } = req.body;
 
-//       if (!newUser) {
-//         return next(new ErrorHandler("Invalid token", 400));
-//       }
-//       const { name, email, password, avatar } = newUser;
+      const newUser = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_SECRET
+      );
 
-//       let user = await User.findOne({ email });
+      if (!newUser) {
+        return next(new ErrorHandler("Invalid token", 400));
+      }
+      const { name, email, password, avatar } = newUser;
 
-//       if (user) {
-//         return next(new ErrorHandler("User already exists", 400));
-//       }
-//       user = await User.create({
-//         name,
-//         email,
-//         avatar,
-//         password,
-//       });
+      let user = await User.findOne({ email });
 
-//       sendToken(user, 201, res);
-//     } catch (error) {
-//       console.error("Error=>", error);
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      if (user) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
+      user = await User.create({
+        name,
+        email,
+        avatar,
+        password,
+      });
 
+      sendToken(user, 201, res);
+    } catch (error) {
+      console.error("Error=>", error);
+      return next(new ErrorHandler(error.message, 500));
+    }
+  });
+
+  
 // login user
-// router.post(
-//   "/login-user",
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const { email, password } = req.body;
+  exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
 
-//       if (!email || !password) {
-//         return next(new ErrorHandler("Please provide the all fields!", 400));
-//       }
+      if (!email || !password) {
+        return next(new ErrorHandler("Please provide all the fields!", 400));
+      }
 
-//       const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({ email }).select("+password");
 
-//       if (!user) {
-//         return next(new ErrorHandler("User doesn't exists!", 400));
-//       }
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exists!", 400));
+      }
 
-//       const isPasswordValid = await user.comparePassword(password);
+      const isPasswordValid = await user.comparePassword(password);
 
-//       if (!isPasswordValid) {
-//         return next(
-//           new ErrorHandler("Please provide the correct information", 400)
-//         );
-//       }
+      if (!isPasswordValid) {
+        return next(
+          new ErrorHandler("Please provide the correct information", 400)
+        );
+      }
 
-//       sendToken(user, 201, res);
-//     } catch (error) {
-//       console.error("Error=>", error);
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      sendToken(user, 201, res);
+    } catch (error) {
+      console.error("Error=>", error);
+      return next(new ErrorHandler(error.message, 500));
+    }
+  });
+
 
 // load user
-// router.get(
-//   "/getuser",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const user = await User.findById(req.user.id);
+  isAuthenticated,
+exports.getUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
 
-//       if (!user) {
-//         return next(new ErrorHandler("User doesn't exists", 400));
-//       }
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exist", 400));
+      }
 
-//       res.status(200).json({
-//         success: true,
-//         user,
-//       });
-//     } catch (error) {
-//       console.error("Error=>", error);
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      console.error("Error=>", error);
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+
 
 // log out user
-// router.get(
-//   "/logout",
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       res.cookie("token", null, {
-//         expires: new Date(Date.now()),
-//         httpOnly: true,
-//         sameSite: "none",
-//         secure: true,
-//       });
-//       res.status(201).json({
-//         success: true,
-//         message: "Log out successful!",
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+ exports.logOutUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+      res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+      res.status(201).json({
+        success: true,
+        message: "Log out successful!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+
 
 // update user info
-// router.put(
-//   "/update-user-info",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const { email, password, phoneNumber, name } = req.body;
+  ,
+  exports.updateUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email, password, phoneNumber, name } = req.body;
 
-//       const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({ email }).select("+password");
 
-//       if (!user) {
-//         return next(new ErrorHandler("User not found", 400));
-//       }
+      if (!user) {
+        return next(new ErrorHandler("User not found", 400));
+      }
 
-//       const isPasswordValid = await user.comparePassword(password);
+      const isPasswordValid = await user.comparePassword(password);
 
-//       if (!isPasswordValid) {
-//         return next(
-//           new ErrorHandler("Please provide the correct information", 400)
-//         );
-//       }
+      if (!isPasswordValid) {
+        return next(
+          new ErrorHandler("Please provide the correct information", 400)
+        );
+      }
 
-//       user.name = name;
-//       user.email = email;
-//       user.phoneNumber = phoneNumber;
+      user.name = name;
+      user.email = email;
+      user.phoneNumber = phoneNumber;
 
-//       await user.save();
+      await user.save();
 
-//       res.status(201).json({
-//         success: true,
-//         user,
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(201).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  });
 
 // update user avatar
-// router.put(
-//   "/update-avatar",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       let existsUser = await User.findById(req.user.id);
-//       if (req.body.avatar !== "") {
-//         const imageId = existsUser.avatar.public_id;
+  exports. updateAvatar = catchAsyncErrors(async (req, res, next) => {
+    try {
+      let existingUser = await User.findById(req.user.id);
+      if (req.body.avatar !== "") {
+        const imageId = existingUser.avatar.public_id;
 
-//         await cloudinary.v2.uploader.destroy(imageId);
+        await cloudinary.v2.uploader.destroy(imageId);
 
-//         const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-//           folder: "avatars",
-//           width: 150,
-//         });
+        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+          folder: "avatars",
+          width: 150,
+        });
 
-//         existsUser.avatar = {
-//           public_id: myCloud.public_id,
-//           url: myCloud.secure_url,
-//         };
-//       }
+        existingUser.avatar = {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      }
 
-//       await existsUser.save();
+      await existingUser.save();
 
-//       res.status(200).json({
-//         success: true,
-//         user: existsUser,
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(200).json({
+        success: true,
+        user: existingUser,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+
 
 // update user addresses
 // router.put(
