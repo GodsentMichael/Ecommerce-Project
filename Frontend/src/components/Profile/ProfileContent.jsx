@@ -368,6 +368,8 @@ const AllRefundOrders = () => {
         pageSize={10}
         autoHeight
         disableSelectionOnClick
+        pagination
+  rowsPerPageOptions={[10, 25, 50, 100]}
       />
     </div>
   );
