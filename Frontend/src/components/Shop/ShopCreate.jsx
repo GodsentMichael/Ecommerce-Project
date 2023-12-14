@@ -16,9 +16,13 @@ const ShopCreate = () => {
   const [avatar, setAvatar] = useState();
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+       // SET isLoading TO TRUE TO START LOADING
+       setLoading(true);
 
     axios
       .post(`${server}/shop/create-shop`, {
@@ -31,6 +35,7 @@ const ShopCreate = () => {
         phoneNumber,
       })
       .then((res) => {
+        console.log("RES=>", res)
         toast.success(res.data.message);
         setName("");
         setEmail("");
@@ -39,9 +44,15 @@ const ShopCreate = () => {
         setZipCode();
         setAddress("");
         setPhoneNumber();
+
+           // SET isLoading BACK TO FALSE AFTER A SUCCESSFUL SUBMISSION
+           setLoading(false);
       })
       .catch((error) => {
         toast.error(error.response.data.message);
+        console.log(error)
+         // IN CASE OF AN ERROR SET isLoading BACK TO FALSE
+         setLoading(false);
       });
   };
 
@@ -198,7 +209,7 @@ const ShopCreate = () => {
 
             <div>
               <label
-                htmlFor="avatar"
+                htmlFor="avatar" id="avatar"
                 className="block text-sm font-medium text-gray-700"
               ></label>
               <div className="mt-2 flex items-center">
@@ -233,8 +244,9 @@ const ShopCreate = () => {
               <button
                 type="submit"
                 className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading} // DISABLE THE BUTTON WHEN isLoading IS TRUE.
               >
-                Submit
+               {isLoading ? "Loading..." : "Submit"}
               </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>

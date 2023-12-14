@@ -9,7 +9,7 @@ const upload = multer({ storage });
 const uploadToCloudinary = async(file) => {
     try {
         const result = await cloudinary.uploader.upload(file.path, {
-            folder: "kycDocuments",
+            folder: "avatars",
             use_filename: true,
         });
         // console.log("result=>", result);

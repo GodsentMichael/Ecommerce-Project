@@ -12,14 +12,11 @@ const Activation = () => {
   useEffect(() => {
     const activationToken = searchParams.get("activation_token");
     if (activationToken) {
-      console.log("ACTIVATIONTOKEN=>", activationToken);
       const sendRequest = async () => {
         try {
           const res = await axios.post(`${server}/user/activation`, {
             activation_token: activationToken,
           });
-          console.log("ACTIVATION TOKEN=>", activationToken);
-          console.log(res);
         } catch (err) {
           console.log(err);
           setError(true);

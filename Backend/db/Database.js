@@ -7,7 +7,7 @@ const connectDatabase = () => {
       useUnifiedTopology: true,
     })
     .then((data) => {
-      console.log(`mongodb connected successfuly with server: ${data.connection.host}`);
+      console.log(`Godsent-storesDB connected successfuly with server: ${data.connection.host}`);
     });
 };
 

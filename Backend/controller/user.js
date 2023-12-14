@@ -1,13 +1,11 @@
 const express = require("express");
 const User = require("../model/user");
-const router = express.Router();
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
-const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 //CREATE USER 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
@@ -42,7 +40,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     try {
       await sendMail({
         email: user.email,
-        subject: "Activate your account",
+        subject: "Activate Your Account",
         message: `Hello ${user.name}, please click on the link to activate your account: ${activationUrl}`,
       });
       res.status(201).json({
@@ -100,7 +98,7 @@ exports.activateUser = catchAsyncErrors(async (req, res, next) => {
   });
 
 // LOGIN USER
-  exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     try {
       const { email, password } = req.body;
 
@@ -127,7 +125,7 @@ exports.activateUser = catchAsyncErrors(async (req, res, next) => {
       console.error("Error=>", error);
       return next(new ErrorHandler(error.message, 500));
     }
-  });
+});
 
 // LOAD USER
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
