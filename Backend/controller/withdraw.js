@@ -2,16 +2,12 @@ const Shop = require("../model/shop");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const express = require("express");
-const { isSeller, isAuthenticated, isAdmin } = require("../middleware/auth");
 const Withdraw = require("../model/withdraw");
 const sendMail = require("../utils/sendMail");
 const router = express.Router();
 
-// create withdraw request --- only for seller
-router.post(
-  "/create-withdraw-request",
-  isSeller,
-  catchAsyncErrors(async (req, res, next) => {
+// CREATE WITHDRAWAL REQUEST --- ONLY FOR SELLERS
+exports.createWithdrawalReq = catchAsyncErrors(async (req, res, next) => {
     try {
       const { amount } = req.body;
 
@@ -48,16 +44,11 @@ router.post(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// get all withdraws --- admnin
 
-router.get(
-  "/get-all-withdraw-request",
-  isAuthenticated,
-  isAdmin("Admin"),
-  catchAsyncErrors(async (req, res, next) => {
+// GET ALL WTTHDRAWAL REQUEST --- ADMIN
+exports.getAllWithdrawalReq = catchAsyncErrors(async (req, res, next) => {
     try {
       const withdraws = await Withdraw.find().sort({ createdAt: -1 });
 
@@ -68,22 +59,19 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// update withdraw request ---- admin
-router.put(
-  "/update-withdraw-request/:id",
-  isAuthenticated,
-  isAdmin("Admin"),
-  catchAsyncErrors(async (req, res, next) => {
+
+// UPDATE WITHDRAWAL REQUEST --- ADMIN
+
+exports.updateWithdrawalReq = catchAsyncErrors(async (req, res, next) => {
     try {
       const { sellerId } = req.body;
 
       const withdraw = await Withdraw.findByIdAndUpdate(
         req.params.id,
         {
-          status: "succeed",
+          status: "succeeded",
           updatedAt: Date.now(),
         },
         { new: true }
@@ -91,14 +79,14 @@ router.put(
 
       const seller = await Shop.findById(sellerId);
 
-      const transection = {
+      const transaction = {
         _id: withdraw._id,
         amount: withdraw.amount,
         updatedAt: withdraw.updatedAt,
         status: withdraw.status,
       };
 
-      seller.transections = [...seller.transections, transection];
+      seller.transactions = [...seller.transactions, transaction];
 
       await seller.save();
 
@@ -118,7 +106,6 @@ router.put(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
 module.exports = router;

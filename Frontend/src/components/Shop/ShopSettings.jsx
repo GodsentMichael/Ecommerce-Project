@@ -79,7 +79,7 @@ const ShopSettings = () => {
             <img
               src={avatar ? avatar : `${seller.avatar?.url}`}
               alt=""
-              className="w-[200px] h-[200px] rounded-full cursor-pointer"
+              className="w-[100px] h-[100px] rounded-full cursor-pointer"
             />
             <div className="w-[30px] h-[30px] bg-[#E3E9EE] rounded-full flex items-center justify-center cursor-pointer absolute bottom-[10px] right-[15px]">
               <input
@@ -172,11 +172,11 @@ const ShopSettings = () => {
             />
           </div>
 
-          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
+          <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5 ">
             <input
               type="submit"
               value="Update Shop"
-              className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
+              className={`${styles.input} !w-[95%] mb-4 800px:mb-0 bg-blue-500`}
               required
               readOnly
             />
