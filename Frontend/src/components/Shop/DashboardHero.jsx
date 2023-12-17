@@ -152,6 +152,7 @@ const DashboardHero = () => {
         pageSize={10}
         disableSelectionOnClick
         autoHeight
+        rowsPerPageOptions={[10, 20, 30]}
       />
       </div>
     </div>

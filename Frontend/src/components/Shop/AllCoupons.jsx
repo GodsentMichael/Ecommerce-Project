@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
+import { getAllProductsShop } from "../../redux/actions/product";
 import styles from "../../styles/styles";
 import Loader from "../Layout/Loader";
 import { server } from "../../server";
@@ -14,15 +15,22 @@ const AllCoupons = () => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [coupouns,setCoupouns] = useState([]);
+  const [coupouns, setCoupouns] = useState([]);
   const [minAmount, setMinAmout] = useState(null);
   const [maxAmount, setMaxAmount] = useState(null);
-  const [selectedProducts, setSelectedProducts] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState("");
   const [value, setValue] = useState(null);
   const { seller } = useSelector((state) => state.seller);
   const { products } = useSelector((state) => state.products);
+  // const [selectedProduct, setSelectedProduct] = useState('');
+  
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   const shopId = 'your-shop-id'; // Replace with the actual shop ID
+  //   dispatch(getAllProductsShop(shopId));
+  // }, [dispatch]);
+  
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,39 +45,49 @@ const AllCoupons = () => {
       .catch((error) => {
         setIsLoading(false);
       });
-  }, [dispatch]);
+  }, [ seller._id, products]);
 
   const handleDelete = async (id) => {
-    axios.delete(`${server}/coupon/delete-coupon/${id}`,{withCredentials: true}).then((res) => {
-      toast.success("Coupon code deleted succesfully!")
-    })
+    axios
+      .delete(`${server}/coupon/delete-coupon/${id}`, { withCredentials: true })
+      .then((res) => {
+        toast.success("Coupon code deleted succesfully!");
+      });
     window.location.reload();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios
-      .post(
-        `${server}/coupon/create-coupon-code`,
-        {
-          name,
-          minAmount,
-          maxAmount,
-          selectedProducts,
-          value,
-          shopId: seller._id,
-        },
-        { withCredentials: true }
-      )
-      .then((res) => {
-       toast.success("Coupon code created successfully!");
-       setOpen(false);
-       window.location.reload();
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
+    setIsLoading(true);
+
+    try {
+      await axios
+        .post(
+          `${server}/coupon/create-coupon-code`,
+          {
+            name,
+            minAmount,
+            maxAmount,
+            selectedProducts,
+            value,
+            shopId: seller._id,
+          },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          toast.success("Coupon code created successfully!");
+          setOpen(false);
+          window.location.reload();
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const columns = [
@@ -108,7 +126,7 @@ const AllCoupons = () => {
   const row = [];
 
   coupouns &&
-  coupouns.forEach((item) => {
+    coupouns.forEach((item) => {
       row.push({
         id: item._id,
         name: item.name,
@@ -137,10 +155,11 @@ const AllCoupons = () => {
             pageSize={10}
             disableSelectionOnClick
             autoHeight
+            rowsPerPageOptions={[10, 20, 30]}
           />
           {open && (
             <div className="fixed top-0 left-0 w-full h-screen bg-[#00000062] z-[20000] flex items-center justify-center">
-              <div className="w-[90%] 800px:w-[40%] h-[80vh] bg-white rounded-md shadow p-4">
+              <div className="w-[90%] 800px:w-[40%] max-h-[80vh] bg-white rounded-md shadow p-4 overflow-y-auto">
                 <div className="w-full flex justify-end">
                   <RxCross1
                     size={30}
@@ -212,27 +231,33 @@ const AllCoupons = () => {
                   <div>
                     <label className="pb-2">Selected Product</label>
                     <select
-                      className="w-full mt-2 border h-[35px] rounded-[5px]"
-                      value={selectedProducts}
-                      onChange={(e) => setSelectedProducts(e.target.value)}
-                    >
-                      <option value="Choose your selected products">
-                        Choose a selected product
-                      </option>
-                      {products &&
-                        products.map((i) => (
-                          <option value={i.name} key={i.name}>
-                            {i.name}
-                          </option>
-                        ))}
-                    </select>
+    className="w-full mt-2 border h-[35px] rounded-[5px] px-2"
+    value={selectedProducts}
+    onChange={(e) => setSelectedProducts(e.target.value)}
+  >
+    <option
+      value="Choose your selected products"
+      style={{ fontStyle: "italic", color: "gray", width: 4 }} disabled
+    >
+      Choose a selected product
+    </option>
+    {products.map((product) => (
+    <option key={product._id} value={product.name}>
+      {product.name}
+    </option>
+  ))}
+  </select>
                   </div>
                   <br />
                   <div>
                     <input
                       type="submit"
-                      value="Create"
-                      className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      value={
+                        isLoading
+                          ? "Creating coupon code pls wait..."
+                          : "Create"
+                      }
+                      className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-blue-400"
                     />
                   </div>
                 </form>

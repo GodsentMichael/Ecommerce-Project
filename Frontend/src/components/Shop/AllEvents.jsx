@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { deleteEvent, getAllEventsShop } from "../../redux/actions/event";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { deleteProduct } from "../../redux/actions/product";
+import {toast} from "react-toastify";
 import Loader from "../Layout/Loader";
 
 const AllEvents = () => {
@@ -19,10 +20,20 @@ const AllEvents = () => {
     dispatch(getAllEventsShop(seller._id));
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteEvent(id));
-    window.location.reload();
-  }
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deleteEvent(id));
+      toast.success("Event deleted successfully!");
+  
+      //DUE TO THE BUG, I INTRODUCED setTimeout()
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  
 
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
@@ -102,7 +113,7 @@ const AllEvents = () => {
       row.push({
         id: item._id,
         name: item.name,
-        price: "US$ " + item.discountPrice,
+        price: "₦" + item.discountPrice,
         Stock: item.stock,
         sold: item.sold_out,
       });
@@ -120,6 +131,7 @@ const AllEvents = () => {
             pageSize={10}
             disableSelectionOnClick
             autoHeight
+            rowsPerPageOptions={[10, 25, 50]}
           />
         </div>
       )}

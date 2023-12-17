@@ -4,7 +4,6 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const express = require("express");
 const Withdraw = require("../model/withdraw");
 const sendMail = require("../utils/sendMail");
-const router = express.Router();
 
 // CREATE WITHDRAWAL REQUEST --- ONLY FOR SELLERS
 exports.createWithdrawalReq = catchAsyncErrors(async (req, res, next) => {
@@ -108,4 +107,3 @@ exports.updateWithdrawalReq = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
-module.exports = router;

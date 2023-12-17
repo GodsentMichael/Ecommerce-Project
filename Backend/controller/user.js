@@ -155,6 +155,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
         sameSite: "none",
         secure: true,
       });
+      // console.log("LOGOUT USER=>", req.user);
       res.status(201).json({
         success: true,
         message: "Log out successful!",

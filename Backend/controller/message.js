@@ -3,12 +3,9 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const express = require("express");
 const cloudinary = require("cloudinary");
-const router = express.Router();
 
-// create new message
-router.post(
-  "/create-new-message",
-  catchAsyncErrors(async (req, res, next) => {
+// CREATE NEW MESSAGE
+exports.createNewMessage = catchAsyncErrors(async (req, res, next) => {
     try {
       const messageData = req.body;
 
@@ -40,15 +37,13 @@ router.post(
         message,
       });
     } catch (error) {
+      console.log("CREATE MESSAGE ERROR=>", error)
       return next(new ErrorHandler(error.message), 500);
     }
-  })
-);
+  });
 
-// get all messages with conversation id
-router.get(
-  "/get-all-messages/:id",
-  catchAsyncErrors(async (req, res, next) => {
+// GET ALL MESSAGES WITH CONVERSATION ID
+exports.getAllMessages = catchAsyncErrors(async (req, res, next) => {
     try {
       const messages = await Messages.find({
         conversationId: req.params.id,
@@ -59,9 +54,8 @@ router.get(
         messages,
       });
     } catch (error) {
+      console.log("GET ALL MESSAGES ERROR=>", error)
       return next(new ErrorHandler(error.message), 500);
     }
-  })
-);
+  });
 
-module.exports = router;

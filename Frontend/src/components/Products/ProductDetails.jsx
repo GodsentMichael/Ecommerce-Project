@@ -64,7 +64,7 @@ const ProductDetails = ({ data }) => {
       toast.error("Item already in cart!");
     } else {
       if (data.stock < 1) {
-        toast.error("Product stock limited!");
+        toast.error("Product stock is limited!");
       } else {
         const cartData = { ...data, qty: count };
         dispatch(addTocart(cartData));
@@ -127,9 +127,9 @@ const ProductDetails = ({ data }) => {
                 <div className="w-full flex">
                   {data &&
                     data.images.map((i, index) => (
-                      <div
+                      <div key={i._id}
                         className={`${
-                          select === 0 ? "border" : "null"
+                          select === index ? "border" : "null"
                         } cursor-pointer`}
                       >
                         <img
@@ -152,10 +152,10 @@ const ProductDetails = ({ data }) => {
                 <p>{data.description}</p>
                 <div className="flex pt-3">
                   <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discountPrice}$
+                    {data.discountPrice} ₦
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
+                    {data.originalPrice ? data.originalPrice + " ₦ " : null}
                   </h3>
                 </div>
 
@@ -308,33 +308,33 @@ const ProductDetailsInfo = ({
         </>
       ) : null}
 
-      {active === 2 ? (
-        <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
-          {data &&
-            data.reviews.map((item, index) => (
-              <div className="w-full flex my-2">
-                <img
-                  src={`${item.user.avatar?.url}`}
-                  alt=""
-                  className="w-[50px] h-[50px] rounded-full"
-                />
-                <div className="pl-2 ">
-                  <div className="w-full flex items-center">
-                    <h1 className="font-[500] mr-3">{item.user.name}</h1>
-                    <Ratings rating={data?.ratings} />
-                  </div>
-                  <p>{item.comment}</p>
-                </div>
-              </div>
-            ))}
-
-          <div className="w-full flex justify-center">
-            {data && data.reviews.length === 0 && (
-              <h5>No Reviews have for this product!</h5>
-            )}
+{active === 2 ? (
+  <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
+    {data && data.reviews && data.reviews.map((item, index) => (
+      <div className="w-full flex my-2" key={index}>
+        <img
+          src={`${item.user.avatar?.url}`}
+          alt=""
+          className="w-[50px] h-[50px] rounded-full"
+        />
+        <div className="pl-2">
+          <div className="w-full flex items-center">
+            <h1 className="font-[500] mr-3">{item.user.name}</h1>
+            <Ratings rating={data?.ratings} />
           </div>
+          <p>{item.comment}</p>
         </div>
-      ) : null}
+      </div>
+    ))}
+
+    <div className="w-full flex justify-center">
+      {data && data.reviews && data.reviews.length === 0 && (
+        <h5>No reviews for this product yet!</h5>
+      )}
+    </div>
+  </div>
+) : null}
+
 
       {active === 3 && (
         <div className="w-full block 800px:flex p-5">

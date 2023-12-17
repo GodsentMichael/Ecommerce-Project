@@ -72,7 +72,8 @@ exports.getAllShopProducts = catchAsyncErrors(async (req, res, next) => {
 // DELETE PRODUCT OF A SHOP
 exports.deleteShopProduct = catchAsyncErrors(async (req, res, next) => {
     try {
-      const product = await Product.findById(req.params.id);
+      let product = await Product.findById(req.params.id);
+      // console.log("PRODUCT=>", product)
 
       if (!product) {
         return next(new ErrorHandler("Product is not found with this id", 404));
@@ -84,7 +85,7 @@ exports.deleteShopProduct = catchAsyncErrors(async (req, res, next) => {
         );
       }
     
-      await product.remove();
+      product = await Product.deleteOne({ _id: req.params.id });
 
       res.status(201).json({
         success: true,

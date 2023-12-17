@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { deleteProduct } from "../../redux/actions/product";
 import Loader from "../Layout/Loader";
+import { toast } from "react-toastify";
 
 const AllProducts = () => {
   const { products, isLoading } = useSelector((state) => state.products);
@@ -16,12 +17,27 @@ const AllProducts = () => {
 
   useEffect(() => {
     dispatch(getAllProductsShop(seller._id));
-  }, [dispatch]);
+  }, [dispatch, seller._id]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteProduct(id));
-    window.location.reload();
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deleteProduct(id));
+      toast.success("Product deleted successfully!");
+  
+      // Update the state locally by dispatching an action to remove the deleted product
+      dispatch({
+        type: "REMOVE_PRODUCT",
+        payload: id,
+      });
+    } catch (error) {
+      toast.error("Error deleting product");
+      console.log("Delete product error:", error);
+    }
   };
+  
+  
+  
+
 
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
@@ -95,10 +111,10 @@ const AllProducts = () => {
   products &&
     products.forEach((item) => {
       row.push({
-        id: item._id,
-        name: item.name,
-        price: "US$ " + item.discountPrice,
-        Stock: item.stock,
+        id: item?._id,
+        name: item?.name,
+        price: "₦ " + item?.discountPrice,
+        Stock: item?.stock,
         sold: item?.sold_out,
       });
     });
@@ -115,6 +131,7 @@ const AllProducts = () => {
             pageSize={10}
             disableSelectionOnClick
             autoHeight
+            rowsPerPageOptions={[10, 25, 50]}
           />
         </div>
       )}

@@ -10,12 +10,16 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios
+    setIsLoading(true)
+
+    try {
+      await axios
       .post(
         `${server}/user/login-user`,
         {
@@ -32,6 +36,12 @@ const Login = () => {
       .catch((err) => {
         toast.error(err.response.data.message);
       });
+    } catch (error) {
+      toast.error(error.message)
+    } finally{
+      setIsLoading(false)
+    }
+    
   };
 
   return (
@@ -120,12 +130,13 @@ const Login = () => {
               </div>
             </div>
             <div>
-              <button
-                type="submit"
-                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Submit
-              </button>
+             <button
+  type="submit"
+  className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+>
+  {isLoading ? "Submitting your details pls wait..." : "Submit"}
+</button>
+
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Don't have an account?</h4>
