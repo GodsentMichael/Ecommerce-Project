@@ -5,8 +5,8 @@ import Footer from "../components/Layout/Footer";
 import Header from "../components/Layout/Header";
 import ProductDetails from "../components/Products/ProductDetails";
 import SuggestedProduct from "../components/Products/SuggestedProduct";
-import { getAllProductsShop } from "../redux/actions/product";
-import Loader from "../components/Layout/Loader"; // Import your Loader component
+
+
 
 const ProductDetailsPage = () => {
   const { allProducts, isLoading } = useSelector((state) => state.products);
@@ -23,11 +23,11 @@ const ProductDetailsPage = () => {
     if (eventData !== null) {
       const eventData = allEvents && allEvents.find((i) => i._id === id);
       setData(eventData);
-      console.log("Event Data:", eventData);
+      // console.log("Event Data=>", eventData);
     } else {
       const productData = allProducts && allProducts.find((i) => i._id === id);
       setData(productData);
-      console.log("Product Data:", productData);
+      // console.log("Product Data=>", productData);
     }
   }, [allProducts, allEvents, id, eventData]);
 

@@ -73,9 +73,12 @@ const ProductDetails = ({ data }) => {
     }
   };
 
-  const totalReviewsLength =
-    products &&
-    products.reduce((acc, product) => acc + product.reviews.length, 0);
+  // const totalReviewsLength =
+  //   products &&
+  //   products.reduce((acc, product) => acc + product.reviews.length, 0);
+
+  const totalReviewsLength = data && data.reviews ? data.reviews.length : 0;
+
 
   const totalRatings =
     products &&
@@ -309,31 +312,31 @@ const ProductDetailsInfo = ({
       ) : null}
 
 {active === 2 ? (
-  <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
-    {data && data.reviews && data.reviews.map((item, index) => (
-      <div className="w-full flex my-2" key={index}>
-        <img
-          src={`${item.user.avatar?.url}`}
-          alt=""
-          className="w-[50px] h-[50px] rounded-full"
-        />
-        <div className="pl-2">
-          <div className="w-full flex items-center">
-            <h1 className="font-[500] mr-3">{item.user.name}</h1>
-            <Ratings rating={data?.ratings} />
-          </div>
-          <p>{item.comment}</p>
+        <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
+          {data.reviews && data.reviews.length > 0 ? (
+            data.reviews.map((item, index) => (
+              <div className="w-full flex my-2" key={index}>
+                <img
+                  src={`${item.user.avatar?.url}`}
+                  alt=""
+                  className="w-[50px] h-[50px] rounded-full"
+                />
+                <div className="pl-2">
+                  <div className="w-full flex items-center">
+                    <h1 className="font-[500] mr-3">{item.user.name}</h1>
+                    <Ratings rating={item.rating} />
+                  </div>
+                  <p>{item.comment}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="w-full flex justify-center">
+              <h5>No reviews for this product yet!</h5>
+            </div>
+          )}
         </div>
-      </div>
-    ))}
-
-    <div className="w-full flex justify-center">
-      {data && data.reviews && data.reviews.length === 0 && (
-        <h5>No reviews for this product yet!</h5>
-      )}
-    </div>
-  </div>
-) : null}
+      ) : null}
 
 
       {active === 3 && (

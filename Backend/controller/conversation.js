@@ -37,6 +37,7 @@ exports.createNewConversation = catchAsyncErrors(async (req, res, next) => {
 // GET SELLER CONVERSATIONS
 exports.getAllSellerCoversation = catchAsyncErrors(async (req, res, next) => {
     try {
+  
       const conversations = await Conversation.find({
         members: {
           $in: [req.params.id],
