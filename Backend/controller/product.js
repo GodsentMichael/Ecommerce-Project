@@ -8,49 +8,107 @@ const ErrorHandler = require("../utils/ErrorHandler");
 
 // CREATE PRODUCT
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
-    try {
-      const shopId = req.body.shopId;
-      const shop = await Shop.findById(shopId);
-      if (!shop) {
-        return next(new ErrorHandler("Shop Id is invalid!", 400));
+  try {
+    const shopId = req.body.shopId;
+    const shop = await Shop.findById(shopId);
+
+    if (!shop) {
+      return next(new ErrorHandler("Shop Id is invalid!", 400));
+    } else {
+      let images = [];
+
+      if (typeof req.body.images === "string") {
+        images.push(req.body.images);
       } else {
-        let images = [];
+        images = req.body.images;
+      }
 
-        if (typeof req.body.images === "string") {
-          images.push(req.body.images);
-        } else {
-          images = req.body.images;
-        }
-      
-        const imagesLinks = [];
-      
-        for (let i = 0; i < images.length; i++) {
-          const result = await cloudinary.v2.uploader.upload(images[i], {
-            folder: "products",
-          });
-      
-          imagesLinks.push({
-            public_id: result.public_id,
-            url: result.secure_url,
-          });
-        }
-      
-        const productData = req.body;
-        productData.images = imagesLinks;
-        productData.shop = shop;
+      const imagesLinks = [];
 
-        const product = await Product.create(productData);
+      for (let i = 0; i < images.length; i++) {
+        const result = await cloudinary.v2.uploader.upload(images[i], {
+          folder: "products",
+        });
 
-        res.status(201).json({
-          success: true,
-          product,
+        imagesLinks.push({
+          public_id: result.public_id,
+          url: result.secure_url,
         });
       }
-    } catch (error) {
-      console.log("PRODUCT CREATION ERROR=>", error)
-      return next(new ErrorHandler(error, 400));
+
+      const productData = req.body;
+      productData.images = imagesLinks;
+      productData.shop = shop;
+
+      const product = await Product.create(productData);
+
+      // Push the newly created product's ObjectId to the shop's products array
+      shop.products.push(product._id);
+      await shop.save();
+
+      res.status(201).json({
+        success: true,
+        product,
+      });
     }
-  });
+  } catch (error) {
+    console.log("PRODUCT CREATION ERROR=>", error);
+    return next(new ErrorHandler(error, 400));
+  }
+});
+
+// exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//     const shopId = req.body.shopId;
+//     const shop = await Shop.findById(shopId);
+    
+//     if (!shop) {
+//       return next(new ErrorHandler("Shop Id is invalid!", 400));
+//     } else {
+//       let images = [];
+
+//       if (typeof req.body.images === "string") {
+//         images.push(req.body.images);
+//       } else {
+//         images = req.body.images;
+//       }
+
+//       const imagesLinks = [];
+
+//       for (let i = 0; i < images.length; i++) {
+//         const result = await cloudinary.v2.uploader.upload(images[i], {
+//           folder: "products",
+//         });
+
+//         imagesLinks.push({
+//           public_id: result.public_id,
+//           url: result.secure_url,
+//         });
+//       }
+
+//       const productData = req.body;
+//       productData.images = imagesLinks;
+
+//       // Update shopId and shop fields
+//       productData.shopId = shopId;
+//       productData.shop = shop._id;
+
+//       const product = await Product.create(productData);
+
+//       // Push the newly created product's ObjectId to the shop's products array
+//       shop.products.push(product._id);
+//       await shop.save();
+
+//       res.status(201).json({
+//         success: true,
+//         product,
+//       });
+//     }
+//   } catch (error) {
+//     console.log("PRODUCT CREATION ERROR=>", error);
+//     return next(new ErrorHandler(error, 400));
+//   }
+// });
 
 
 // GET ALL PRODUCTS OF A SHOP
@@ -68,12 +126,33 @@ exports.getAllShopProducts = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
+// const mongoose = require("mongoose");
+
+// exports.getAllShopProducts = catchAsyncErrors(async (req, res, next) => {
+//   const mongoose = require("mongoose");
+//     try {
+//       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+//         return next(new ErrorHandler("Invalid Shop ID in the request", 400));
+//       }
+
+//       const products = await Product.find({ shopId: req.params.id });
+
+//       res.status(201).json({
+//         success: true,
+//         products,
+//       });
+//     } catch (error) {
+//       console.log("GET ALL SHOP PRODUCTS ERROR=>", error);
+//       return next(new ErrorHandler(error, 400));
+//     }
+// });
+
 
 // DELETE PRODUCT OF A SHOP
 exports.deleteShopProduct = catchAsyncErrors(async (req, res, next) => {
     try {
       let product = await Product.findById(req.params.id);
-      // console.log("PRODUCT=>", product)
+     
 
       if (!product) {
         return next(new ErrorHandler("Product is not found with this id", 404));

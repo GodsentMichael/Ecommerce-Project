@@ -3,6 +3,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const Shop = require("../model/shop");
+const Product = require("../model/product")
 const cloudinary = require("cloudinary");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHandler = require("../utils/ErrorHandler");
@@ -12,7 +13,7 @@ const sendShopToken = require("../utils/shopToken");
 exports.createShop = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name,email,password,avatar,zipCode,address,phoneNumber, } = req.body;
-    console.log("REQ BODY=>", req.body);
+    // console.log("REQ BODY=>", req.body);
 
     if (!name || !email || !password || !avatar || !zipCode || !address || !phoneNumber) {
       return next(new ErrorHandler("Please provide the all fields!", 400));
@@ -45,7 +46,7 @@ exports.createShop = catchAsyncErrors(async (req, res, next) => {
     // const activationUrl = `http://localhost:5173/activation?activation_token=${activationToken}`;
 
     const activationUrl = `http://localhost:5173/seller/activation?activation_token=${activationToken}`;
-    // const activationUrl = `https://eshop-tutorial-pyri.vercel.app/seller/activation/${activationToken}`;
+    // const activationUrl = `https://eshop-pyri.vercel.app/seller/activation/${activationToken}`;
     try {
       await sendMail({
         email: seller.email,
@@ -270,26 +271,55 @@ exports.adminGetAllSellers = catchAsyncErrors(async (req, res, next) => {
 
 
 // DELETE SELLER BY ID --- ADMIN
+// exports.adminDeleteSellerById = catchAsyncErrors(async (req, res, next) => {
+//     try {
+//       const seller = await Shop.findById(req.params.id).populate('product');
+
+//       if (!seller) {
+//         return next(
+//           new ErrorHandler("Seller is not available with this id", 400)
+//         );
+//       }
+
+//       await Shop.findByIdAndDelete(req.params.id);
+
+//       res.status(201).json({
+//         success: true,
+//         message: "Seller deleted successfully!",
+//       });
+//     } catch (error) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+// });
+
 exports.adminDeleteSellerById = catchAsyncErrors(async (req, res, next) => {
-    try {
-      const seller = await Shop.findById(req.params.id);
+  try {
+    // Find the seller and populate the 'product' field
+    const seller = await Shop.findById(req.params.id).populate('products');
 
-      if (!seller) {
-        return next(
-          new ErrorHandler("Seller is not available with this id", 400)
-        );
-      }
-
-      await Shop.findByIdAndDelete(req.params.id);
-
-      res.status(201).json({
-        success: true,
-        message: "Seller deleted successfully!",
-      });
-    } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+    if (!seller) {
+      return next(new ErrorHandler("Seller is not available with this id", 400));
     }
+
+    // Extract product IDs from the populated 'product' field
+    const productIds = seller.products.map(product => product._id);
+
+    // Delete the seller
+    await Shop.findByIdAndDelete(req.params.id);
+
+    // Delete the associated products
+    await Product.deleteMany({ _id: { $in: productIds } });
+
+    res.status(201).json({
+      success: true,
+      message: "Seller and associated products deleted successfully!",
+    });
+  } catch (error) {
+    console.log("ADMIN SELLER DELETE ERROR=>", error);
+    return next(new ErrorHandler(error.message, 500));
+  }
 });
+
 
 // UPDATE SELLER WITHDRAW METHODS --- SELLERS
 

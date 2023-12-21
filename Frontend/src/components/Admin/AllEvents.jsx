@@ -55,7 +55,7 @@ const AllEvents = () => {
       renderCell: (params) => {
         return (
           <>
-            <Link to={`/product/${params.id}?isEvent=true`}>
+            <Link to={`/product/${params?.id}?isEvent=true`}>
               <Button>
                 <AiOutlineEye size={20} />
               </Button>
@@ -73,7 +73,7 @@ const AllEvents = () => {
       row.push({
         id: item._id,
         name: item.name,
-        price: "US$ " + item.discountPrice,
+        price: "₦ " + item.discountPrice,
         Stock: item.stock,
         sold: item.sold_out,
       });
@@ -87,6 +87,7 @@ const AllEvents = () => {
         pageSize={10}
         disableSelectionOnClick
         autoHeight
+        rowsPerPageOptions={[10, 20, 30]}
       />
     </div>
   );

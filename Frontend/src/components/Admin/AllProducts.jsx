@@ -78,7 +78,7 @@ const AllProducts = () => {
       row.push({
         id: item._id,
         name: item.name,
-        price: "US$ " + item.discountPrice,
+        price: "₦ " + item.discountPrice,
         Stock: item.stock,
         sold: item?.sold_out,
       });
@@ -93,6 +93,7 @@ const AllProducts = () => {
             pageSize={10}
             disableSelectionOnClick
             autoHeight
+            rowsPerPageOptions={[10, 20, 30]}
           />
         </div>
     </>
