@@ -235,7 +235,7 @@ export const categoriesData = [
     id: 7,
     title: "Pet Care",
     subTitle: "",
-    image_Url: "https://static.vecteezy.com/system/resources/previews/001/482/528/non_2x/pet-care-logo-or-banner-with-veterinary-doctor-and-dogs-on-white-background-free-vector.jpg",
+    image_Url: "https://img.freepik.com/free-photo/close-up-veterinarian-taking-care-pet_23-2149143877.jpg?size=626&ext=jpg&ga=GA1.1.262039400.1705675838&semt=ais",
   },
   {
     id: 8,

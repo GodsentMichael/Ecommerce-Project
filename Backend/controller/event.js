@@ -114,11 +114,7 @@ exports.deleteShopEvent = catchAsyncErrors(async (req, res, next) => {
 });
 
 // all events --- for admin
-router.get(
-  "/admin-all-events",
-  isAuthenticated,
-  isAdmin("Admin"),
-  catchAsyncErrors(async (req, res, next) => {
+exports.adminGetAllEvents = catchAsyncErrors(async (req, res, next) => {
     try {
       const events = await Event.find().sort({
         createdAt: -1,
@@ -130,6 +126,5 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
