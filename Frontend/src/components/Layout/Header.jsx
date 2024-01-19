@@ -59,7 +59,7 @@ const Header = ({ activeHeading }) => {
             <Link to="/">
               <img
               className="bg-transparent h-12"
-                src="/src/assetss/shop-logo.png"
+                src="https://res.cloudinary.com/dye76dtzn/image/upload/v1705675668/cobwzsgqajv470srblud.png"
                 alt="my-shop-logo"
                 style={{ width: "120px", filter: "brightness(0) grayScale(25%) contrast(0,9)" }}
               />
@@ -102,7 +102,7 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.button}`}>
             <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
               <h1 className="text-[#fff] flex items-center">
-                {isSeller ? "Go Dashboard" : "Become Seller"}{" "}
+                {isSeller ? "Go To Dashboard" : "Become A Seller"}{" "}
                 <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
@@ -304,7 +304,7 @@ const Header = ({ activeHeading }) => {
               <div className={`${styles.button} ml-4 !rounded-[4px]`}>
                 <Link to="/shop-create">
                   <h1 className="text-[#fff] flex items-center">
-                    Become Seller <IoIosArrowForward className="ml-1" />
+                    Become A Seller <IoIosArrowForward className="ml-1" />
                   </h1>
                 </Link>
               </div>

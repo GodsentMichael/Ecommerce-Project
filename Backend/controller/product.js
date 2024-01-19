@@ -1,65 +1,118 @@
 const express = require("express");
-const { isSeller, isAuthenticated, isAdmin } = require("../middleware/auth");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const router = express.Router();
 const Product = require("../model/product");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/ErrorHandler");
 
-// create product
-router.post(
-  "/create-product",
-  catchAsyncErrors(async (req, res, next) => {
-    try {
-      const shopId = req.body.shopId;
-      const shop = await Shop.findById(shopId);
-      if (!shop) {
-        return next(new ErrorHandler("Shop Id is invalid!", 400));
+// CREATE PRODUCT
+exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const shopId = req.body.shopId;
+    const shop = await Shop.findById(shopId);
+
+    if (!shop) {
+      return next(new ErrorHandler("Shop Id is invalid!", 400));
+    } else {
+      let images = [];
+
+      if (typeof req.body.images === "string") {
+        images.push(req.body.images);
       } else {
-        let images = [];
+        images = req.body.images;
+      }
 
-        if (typeof req.body.images === "string") {
-          images.push(req.body.images);
-        } else {
-          images = req.body.images;
-        }
-      
-        const imagesLinks = [];
-      
-        for (let i = 0; i < images.length; i++) {
-          const result = await cloudinary.v2.uploader.upload(images[i], {
-            folder: "products",
-          });
-      
-          imagesLinks.push({
-            public_id: result.public_id,
-            url: result.secure_url,
-          });
-        }
-      
-        const productData = req.body;
-        productData.images = imagesLinks;
-        productData.shop = shop;
+      const imagesLinks = [];
 
-        const product = await Product.create(productData);
+      for (let i = 0; i < images.length; i++) {
+        const result = await cloudinary.v2.uploader.upload(images[i], {
+          folder: "products",
+        });
 
-        res.status(201).json({
-          success: true,
-          product,
+        imagesLinks.push({
+          public_id: result.public_id,
+          url: result.secure_url,
         });
       }
-    } catch (error) {
-      return next(new ErrorHandler(error, 400));
-    }
-  })
-);
 
-// get all products of a shop
-router.get(
-  "/get-all-products-shop/:id",
-  catchAsyncErrors(async (req, res, next) => {
+      const productData = req.body;
+      productData.images = imagesLinks;
+      productData.shop = shop;
+
+      const product = await Product.create(productData);
+
+      // Push the newly created product's ObjectId to the shop's products array
+      shop.products.push(product._id);
+      await shop.save();
+
+      res.status(201).json({
+        success: true,
+        product,
+      });
+    }
+  } catch (error) {
+    console.log("PRODUCT CREATION ERROR=>", error);
+    return next(new ErrorHandler(error, 400));
+  }
+});
+
+// exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//     const shopId = req.body.shopId;
+//     const shop = await Shop.findById(shopId);
+    
+//     if (!shop) {
+//       return next(new ErrorHandler("Shop Id is invalid!", 400));
+//     } else {
+//       let images = [];
+
+//       if (typeof req.body.images === "string") {
+//         images.push(req.body.images);
+//       } else {
+//         images = req.body.images;
+//       }
+
+//       const imagesLinks = [];
+
+//       for (let i = 0; i < images.length; i++) {
+//         const result = await cloudinary.v2.uploader.upload(images[i], {
+//           folder: "products",
+//         });
+
+//         imagesLinks.push({
+//           public_id: result.public_id,
+//           url: result.secure_url,
+//         });
+//       }
+
+//       const productData = req.body;
+//       productData.images = imagesLinks;
+
+//       // Update shopId and shop fields
+//       productData.shopId = shopId;
+//       productData.shop = shop._id;
+
+//       const product = await Product.create(productData);
+
+//       // Push the newly created product's ObjectId to the shop's products array
+//       shop.products.push(product._id);
+//       await shop.save();
+
+//       res.status(201).json({
+//         success: true,
+//         product,
+//       });
+//     }
+//   } catch (error) {
+//     console.log("PRODUCT CREATION ERROR=>", error);
+//     return next(new ErrorHandler(error, 400));
+//   }
+// });
+
+
+// GET ALL PRODUCTS OF A SHOP
+exports.getAllShopProducts = catchAsyncErrors(async (req, res, next) => {
     try {
       const products = await Product.find({ shopId: req.params.id });
 
@@ -68,18 +121,38 @@ router.get(
         products,
       });
     } catch (error) {
+      console.log("GET ALL SHOP PRODUCTS ERROR=>", error)
       return next(new ErrorHandler(error, 400));
     }
-  })
-);
+  });
 
-// delete product of a shop
-router.delete(
-  "/delete-shop-product/:id",
-  isSeller,
-  catchAsyncErrors(async (req, res, next) => {
+// const mongoose = require("mongoose");
+
+// exports.getAllShopProducts = catchAsyncErrors(async (req, res, next) => {
+//   const mongoose = require("mongoose");
+//     try {
+//       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+//         return next(new ErrorHandler("Invalid Shop ID in the request", 400));
+//       }
+
+//       const products = await Product.find({ shopId: req.params.id });
+
+//       res.status(201).json({
+//         success: true,
+//         products,
+//       });
+//     } catch (error) {
+//       console.log("GET ALL SHOP PRODUCTS ERROR=>", error);
+//       return next(new ErrorHandler(error, 400));
+//     }
+// });
+
+
+// DELETE PRODUCT OF A SHOP
+exports.deleteShopProduct = catchAsyncErrors(async (req, res, next) => {
     try {
-      const product = await Product.findById(req.params.id);
+      let product = await Product.findById(req.params.id);
+     
 
       if (!product) {
         return next(new ErrorHandler("Product is not found with this id", 404));
@@ -91,22 +164,20 @@ router.delete(
         );
       }
     
-      await product.remove();
+      product = await Product.deleteOne({ _id: req.params.id });
 
       res.status(201).json({
         success: true,
         message: "Product Deleted successfully!",
       });
     } catch (error) {
+      console.log("DELETE PRODUCT ERROR=>", error)
       return next(new ErrorHandler(error, 400));
     }
-  })
-);
+  });
 
-// get all products
-router.get(
-  "/get-all-products",
-  catchAsyncErrors(async (req, res, next) => {
+// GET AL PRODUCTS
+exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     try {
       const products = await Product.find().sort({ createdAt: -1 });
 
@@ -115,16 +186,14 @@ router.get(
         products,
       });
     } catch (error) {
+      console.log("GET ALL PRODUCTS ERROR=>", error)
       return next(new ErrorHandler(error, 400));
     }
-  })
-);
+});
 
-// review for a product
-router.put(
-  "/create-new-review",
-  isAuthenticated,
-  catchAsyncErrors(async (req, res, next) => {
+
+// REVIEW FOR A PRODUCT
+exports.makeReview = catchAsyncErrors(async (req, res, next) => {
     try {
       const { user, rating, comment, productId, orderId } = req.body;
 
@@ -169,20 +238,17 @@ router.put(
 
       res.status(200).json({
         success: true,
-        message: "Reviwed succesfully!",
+        message: "Reviewed succesfully!",
       });
     } catch (error) {
+      console.log("MAKE REVIEW ERROR=>", error)
       return next(new ErrorHandler(error, 400));
     }
-  })
-);
+  });
 
-// all products --- for admin
-router.get(
-  "/admin-all-products",
-  isAuthenticated,
-  isAdmin("Admin"),
-  catchAsyncErrors(async (req, res, next) => {
+
+// ALL PRODUCTS --- FOR ADMIN
+exports.adminGetAllProducts = catchAsyncErrors(async (req, res, next) => {
     try {
       const products = await Product.find().sort({
         createdAt: -1,
@@ -194,6 +260,5 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
-module.exports = router;
+  });
+

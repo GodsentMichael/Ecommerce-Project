@@ -16,7 +16,7 @@ const EventCard = ({ active, data }) => {
       toast.error("Item already in cart!");
     } else {
       if (data.stock < 1) {
-        toast.error("Product stock limited!");
+        toast.error("Product stock is limited!");
       } else {
         const cartData = { ...data, qty: 1 };
         dispatch(addTocart(cartData));
@@ -25,41 +25,46 @@ const EventCard = ({ active, data }) => {
     }
   }
   return (
-    <div
-      className={`w-full block bg-white rounded-lg ${
-        active ? "unset" : "mb-12"
-      } lg:flex p-2`}
-    >
-      <div className="w-full lg:-w[50%] m-auto">
-        <img src={`${data?.images[0]?.url}`} alt="" />
+    <div className={`w-full block bg-white rounded-lg ${active ? "unset" : "mb-12"} lg:flex p-2`}>
+      <div className="w-full lg:w-1/2 mx-auto mb-4 lg:mb-0">
+        <img
+          src={`${data?.images[0]?.url}`}
+          alt={data?.name}
+          className="w-full h-auto  object-cover rounded-lg"
+        />
       </div>
-      <div className="w-full lg:[w-50%] flex flex-col justify-center">
-        <h2 className={`${styles.productTitle}`}>{data?.name}</h2>
-        <p>{data?.description}</p>
-        <div className="flex py-2 justify-between">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center pl-4">
+        <h2 className={`${styles.productTitle} text-2xl font-bold mb-2`}>{data?.name}</h2>
+        <p className="text-gray-700 mb-4">{data?.description}</p>
+        <div className="flex items-center justify-between mb-4">
           <div className="flex">
-            <h5 className="font-[500] text-[18px] text-[#d55b45] pr-3 line-through">
-              {data?.originalPrice}$
+            <h5 className="font-semibold text-red-500 text-sm line-through pr-3">
+              {data?.originalPrice}₦
             </h5>
-            <h5 className="font-bold text-[20px] text-[#333] font-Roboto">
-              {data?.discountPrice}$
+            <h5 className="font-bold text-lg text-black">
+              {data?.discountPrice}₦
             </h5>
           </div>
-          <span className="pr-3 font-[400] text-[17px] text-[#44a55e]">
+          <span className="text-green-600 text-sm pr-3">
             {data?.sold_out} sold
           </span>
         </div>
         <CountDown data={data} />
-        <br />
-        <div className="flex items-center">
-          <Link to={`/product/${data?._id}?isEvent=true`}>
-            <div className={`${styles.button} text-[#fff]`}>See Details</div>
+        <div className="flex items-center mt-4">
+          <Link to={`/product/${data?._id}?isEvent=true`} className={`${styles.button} text-white`}>
+            See Details
           </Link>
-          <div className={`${styles.button} text-[#fff] ml-5`} onClick={() => addToCartHandler(data)}>Add to cart</div>
+          <div
+            className={`${styles.button} text-white ml-4`}
+            onClick={() => addToCartHandler(data)}
+          >
+            Add to Cart
+          </div>
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default EventCard;

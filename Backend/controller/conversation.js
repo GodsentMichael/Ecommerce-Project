@@ -3,12 +3,10 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const express = require("express");
 const { isSeller, isAuthenticated } = require("../middleware/auth");
-const router = express.Router();
 
-// create a new conversation
-router.post(
-  "/create-new-conversation",
-  catchAsyncErrors(async (req, res, next) => {
+
+// CREATE A NEW CONVERSATION
+exports.createNewConversation = catchAsyncErrors(async (req, res, next) => {
     try {
       const { groupTitle, userId, sellerId } = req.body;
 
@@ -34,14 +32,30 @@ router.post(
     } catch (error) {
       return next(new ErrorHandler(error.response.message), 500);
     }
-  })
-);
+  }) ;
 
-// get seller conversations
-router.get(
-  "/get-all-conversation-seller/:id",
-  isSeller,
-  catchAsyncErrors(async (req, res, next) => {
+// GET SELLER CONVERSATIONS
+exports.getAllSellerCoversation = catchAsyncErrors(async (req, res, next) => {
+    try {
+  
+      const conversations = await Conversation.find({
+        members: {
+          $in: [req.params.id],
+        },
+      }).sort({ updatedAt: -1, createdAt: -1 });
+
+      res.status(201).json({
+        success: true,
+        conversations,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error), 500);
+    }
+  });
+
+
+// GET USER CONVERSATIONS
+exports.getAllUserConversations = catchAsyncErrors(async (req, res, next) => {
     try {
       const conversations = await Conversation.find({
         members: {
@@ -56,36 +70,10 @@ router.get(
     } catch (error) {
       return next(new ErrorHandler(error), 500);
     }
-  })
-);
+});
 
-
-// get user conversations
-router.get(
-  "/get-all-conversation-user/:id",
-  isAuthenticated,
-  catchAsyncErrors(async (req, res, next) => {
-    try {
-      const conversations = await Conversation.find({
-        members: {
-          $in: [req.params.id],
-        },
-      }).sort({ updatedAt: -1, createdAt: -1 });
-
-      res.status(201).json({
-        success: true,
-        conversations,
-      });
-    } catch (error) {
-      return next(new ErrorHandler(error), 500);
-    }
-  })
-);
-
-// update the last message
-router.put(
-  "/update-last-message/:id",
-  catchAsyncErrors(async (req, res, next) => {
+// UPDATE THE LAST MESSAGE
+exports.updateLastMessage = catchAsyncErrors(async (req, res, next) => {
     try {
       const { lastMessage, lastMessageId } = req.body;
 
@@ -101,7 +89,5 @@ router.put(
     } catch (error) {
       return next(new ErrorHandler(error), 500);
     }
-  })
-);
+  });
 
-module.exports = router;

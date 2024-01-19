@@ -1,5 +1,4 @@
 const express = require("express");
-const router = express.Router();
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
@@ -8,9 +7,7 @@ const Shop = require("../model/shop");
 const Product = require("../model/product");
 
 // create new order
-router.post(
-  "/create-order",
-  catchAsyncErrors(async (req, res, next) => {
+exports.createOrder = catchAsyncErrors(async (req, res, next) => {
     try {
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
 
@@ -44,15 +41,13 @@ router.post(
         orders,
       });
     } catch (error) {
+      console.log("CREATE ORDER ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+});
 
 // get all orders of user
-router.get(
-  "/get-all-orders/:userId",
-  catchAsyncErrors(async (req, res, next) => {
+exports.getAnOrderById = catchAsyncErrors(async (req, res, next) => {
     try {
       const orders = await Order.find({ "user._id": req.params.userId }).sort({
         createdAt: -1,
@@ -63,15 +58,14 @@ router.get(
         orders,
       });
     } catch (error) {
+      console.log("GET ORDER-BY-ID ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// get all orders of seller
-router.get(
-  "/get-seller-all-orders/:shopId",
-  catchAsyncErrors(async (req, res, next) => {
+
+// GET ALL ORDERS RELATED TO A SELLER
+exports.sellerGetAllOrders = catchAsyncErrors(async (req, res, next) => {
     try {
       const orders = await Order.find({
         "cart.shopId": req.params.shopId,
@@ -84,16 +78,13 @@ router.get(
         orders,
       });
     } catch (error) {
+      console.log("GET ALL SELLER'S ORDERS ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// update order status for seller
-router.put(
-  "/update-order-status/:id",
-  isSeller,
-  catchAsyncErrors(async (req, res, next) => {
+// UPDATE ORDER STATUS FOR SELLER
+exports.updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
     try {
       const order = await Order.findById(req.params.id);
 
@@ -139,15 +130,13 @@ router.put(
         await seller.save();
       }
     } catch (error) {
+      console.log("UPDATE ORDER STATUS ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// give a refund ----- user
-router.put(
-  "/order-refund/:id",
-  catchAsyncErrors(async (req, res, next) => {
+// GIVE A RFFUND ----- USER
+exports.requestOrderRefund = catchAsyncErrors(async (req, res, next) => {
     try {
       const order = await Order.findById(req.params.id);
 
@@ -162,19 +151,17 @@ router.put(
       res.status(200).json({
         success: true,
         order,
-        message: "Order Refund Request successfully!",
+        message: "Refund of Order Requested successfully!",
       });
     } catch (error) {
+      console.log("REQUEST ORDER REFUND ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// accept the refund ---- seller
-router.put(
-  "/order-refund-success/:id",
-  isSeller,
-  catchAsyncErrors(async (req, res, next) => {
+
+// ACCEPT THE REFUND REQUEST ---- SELLER
+exports.acceptRefundRequest = catchAsyncErrors(async (req, res, next) => {
     try {
       const order = await Order.findById(req.params.id);
 
@@ -188,7 +175,7 @@ router.put(
 
       res.status(200).json({
         success: true,
-        message: "Order Refund successfull!",
+        message: "Order Refund, Accepted Successfully!",
       });
 
       if (req.body.status === "Refund Success") {
@@ -206,17 +193,14 @@ router.put(
         await product.save({ validateBeforeSave: false });
       }
     } catch (error) {
+      console.log("ACCEPT REFUND REQUEST ERROR=>",error);
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-// all orders --- for admin
-router.get(
-  "/admin-all-orders",
-  isAuthenticated,
-  isAdmin("Admin"),
-  catchAsyncErrors(async (req, res, next) => {
+
+// ALL ORDERS --- FOR ADMIN
+exports.adminGetAllOrders = catchAsyncErrors(async (req, res, next) => {
     try {
       const orders = await Order.find().sort({
         deliveredAt: -1,
@@ -227,9 +211,8 @@ router.get(
         orders,
       });
     } catch (error) {
+      console.log("ADMIN GET ALL ORDERS ERROR=>",error)
       return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+  });
 
-module.exports = router;

@@ -33,6 +33,14 @@ app.use("/test", (req, res) => {
 
 //IMPORT ROUTES
 const user = require('./routes/user');
+const shop = require('./routes/shop');
+const product = require('./routes/product');
+const event = require('./routes/event');
+const order = require('./routes/order');
+const message = require('./routes/message');
+const withdraw = require('./routes/withdraw');
+const coupon = require('./routes/coupon');
+const conversation = require('./routes/conversation');
 
 
 // import routes
@@ -49,15 +57,15 @@ const user = require('./routes/user');
 
 //DEFINE ROUTES
 app.use("/api/v2/user", user);
-// app.use("/api/v2/conversation", conversation);
-// app.use("/api/v2/message", message);
-// app.use("/api/v2/order", order);
-// app.use("/api/v2/shop", shop);
-// app.use("/api/v2/product", product);
-// app.use("/api/v2/event", event);
-// app.use("/api/v2/coupon", coupon);
+app.use("/api/v2/conversation", conversation);
+app.use("/api/v2/message", message);
+app.use("/api/v2/order", order);
+app.use("/api/v2/shop", shop);
+app.use("/api/v2/product", product);
+app.use("/api/v2/event", event);
+app.use("/api/v2/coupon", coupon);
 // app.use("/api/v2/payment", payment);
-// app.use("/api/v2/withdraw", withdraw);
+app.use("/api/v2/withdraw", withdraw);
 
 // THIS IS FOR ERROR HANDLING.
 app.use(ErrorHandler);

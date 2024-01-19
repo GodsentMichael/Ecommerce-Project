@@ -1,15 +1,13 @@
 const express = require("express");
 const User = require("../model/user");
-const router = express.Router();
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
-const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
-// create user
+//CREATE USER 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name, email, password, avatar } = req.body;
@@ -42,7 +40,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     try {
       await sendMail({
         email: user.email,
-        subject: "Activate your account",
+        subject: "Activate Your Account",
         message: `Hello ${user.name}, please click on the link to activate your account: ${activationUrl}`,
       });
       res.status(201).json({
@@ -58,15 +56,14 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// create activation token
+// CREATE ACTIVATION TOKEN
 const createActivationToken = (user) => {
   return jwt.sign(user, process.env.ACTIVATION_SECRET, {
     expiresIn: "5m",
   });
 };
 
-// activate user
-
+// ACTIVATE USER
 exports.activateUser = catchAsyncErrors(async (req, res, next) => {
     try {
       const { activation_token } = req.body;
@@ -100,9 +97,8 @@ exports.activateUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
-  
-// login user
-  exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+// LOGIN USER
+exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     try {
       const { email, password } = req.body;
 
@@ -129,14 +125,12 @@ exports.activateUser = catchAsyncErrors(async (req, res, next) => {
       console.error("Error=>", error);
       return next(new ErrorHandler(error.message, 500));
     }
-  });
+});
 
-
-// load user
-  isAuthenticated,
+// LOAD USER
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
     try {
-      const user = await User.findById(req.user.id);
+      const user = await User.findById(req.user?.id);
 
       if (!user) {
         return next(new ErrorHandler("User doesn't exist", 400));
@@ -152,8 +146,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     }
   })
 
-
-// log out user
+// LOGOUT USER
  exports.logOutUser = catchAsyncErrors(async (req, res, next) => {
     try {
       res.cookie("token", null, {
@@ -162,6 +155,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
         sameSite: "none",
         secure: true,
       });
+      // console.log("LOGOUT USER=>", req.user);
       res.status(201).json({
         success: true,
         message: "Log out successful!",
@@ -171,9 +165,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     }
   })
 
-
-// update user info
-  ,
+//UPDATE USER
   exports.updateUser = catchAsyncErrors(async (req, res, next) => {
     try {
       const { email, password, phoneNumber, name } = req.body;
@@ -207,7 +199,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
-// update user avatar
+// UPDATE USER AVATAR
   exports. updateAvatar = catchAsyncErrors(async (req, res, next) => {
     try {
       let existingUser = await User.findById(req.user.id);
@@ -238,8 +230,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     }
   })
 
-
-// update user addresses
+// UPDATE USER ADDRESSES
  exports.updateUserAddresses = catchAsyncErrors(async (req, res, next) => {
     try {
       const user = await User.findById(req.user.id);
@@ -275,132 +266,110 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
-// delete user address
-// router.delete(
-//   "/delete-user-address/:id",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const userId = req.user._id;
-//       const addressId = req.params.id;
+// DELETE USER ADDRESS
+  exports.deleteUserAddress = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const userId = req.user._id;
+      const addressId = req.params.id;
 
-//       await User.updateOne(
-//         {
-//           _id: userId,
-//         },
-//         { $pull: { addresses: { _id: addressId } } }
-//       );
+      await User.updateOne(
+        {
+          _id: userId,
+        },
+        { $pull: { addresses: { _id: addressId } } }
+      );
 
-//       const user = await User.findById(userId);
+      const user = await User.findById(userId);
 
-//       res.status(200).json({ success: true, user });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(200).json({ success: true, user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 
-// update user password
-// router.put(
-//   "/update-user-password",
-//   isAuthenticated,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const user = await User.findById(req.user.id).select("+password");
+//UPDATE USER PASSWORD
+  exports.updateUserPassword = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id).select("+password");
 
-//       const isPasswordMatched = await user.comparePassword(
-//         req.body.oldPassword
-//       );
+      const isPasswordMatched = await user.comparePassword(
+        req.body.oldPassword
+      );
 
-//       if (!isPasswordMatched) {
-//         return next(new ErrorHandler("Old password is incorrect!", 400));
-//       }
+      if (!isPasswordMatched) {
+        return next(new ErrorHandler("Old password is incorrect!", 400));
+      }
 
-//       if (req.body.newPassword !== req.body.confirmPassword) {
-//         return next(
-//           new ErrorHandler("Password doesn't matched with each other!", 400)
-//         );
-//       }
-//       user.password = req.body.newPassword;
+      if (req.body.newPassword !== req.body.confirmPassword) {
+        return next(
+          new ErrorHandler("Password doesn't match with each other!", 400)
+        );
+      }
+      user.password = req.body.newPassword;
 
-//       await user.save();
+      await user.save();
 
-//       res.status(200).json({
-//         success: true,
-//         message: "Password updated successfully!",
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(200).json({
+        success: true,
+        message: "Password updated successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 
-// find user infoormation with the userId
-// router.get(
-//   "/user-info/:id",
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const user = await User.findById(req.params.id);
+// IND USER INFORMATION WITH USER ID
+  exports.userInfo = catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.id);
 
-//       res.status(201).json({
-//         success: true,
-//         user,
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(201).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 
-// all users --- for admin
-// router.get(
-//   "/admin-all-users",
-//   isAuthenticated,
-//   isAdmin("Admin"),
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const users = await User.find().sort({
-//         createdAt: -1,
-//       });
-//       res.status(201).json({
-//         success: true,
-//         users,
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+// GET ALL USERS --- for admin
+exports.adminGetUsers =  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const users = await User.find().sort({
+        createdAt: -1,
+      });
+      res.status(201).json({
+        success: true,
+        users,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 
-// delete users --- admin
-// router.delete(
-//   "/delete-user/:id",
-//   isAuthenticated,
-//   isAdmin("Admin"),
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const user = await User.findById(req.params.id);
+// DELETE USERS --- admin  
+exports.adminDeleteUser =  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.params.id);
 
-//       if (!user) {
-//         return next(
-//           new ErrorHandler("User is not available with this id", 400)
-//         );
-//       }
+      if (!user) {
+        return next(
+          new ErrorHandler("User is not available with this id", 400)
+        );
+      }
 
-//       const imageId = user.avatar.public_id;
+      const imageId = user.avatar.public_id;
 
-//       await cloudinary.v2.uploader.destroy(imageId);
+      await cloudinary.v2.uploader.destroy(imageId);
 
-//       await User.findByIdAndDelete(req.params.id);
+      await User.findByIdAndDelete(req.params.id);
 
-//       res.status(201).json({
-//         success: true,
-//         message: "User deleted successfully!",
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   })
-// );
+      res.status(201).json({
+        success: true,
+        message: "User deleted successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
 
-// module.exports = router;

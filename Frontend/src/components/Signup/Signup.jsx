@@ -3,7 +3,6 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
-// import Button from '@girishsawant999/react-loading-button';
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
@@ -36,8 +35,7 @@ const Singup = () => {
 
     axios
       .post(`${server}/user/create-user`, { name, email, password, avatar })
-      .then((res) => {
-        console.log("RES=>", res)
+      .then((res) => {   
         toast.success(res.data.message);
         setName("");
         setEmail("");

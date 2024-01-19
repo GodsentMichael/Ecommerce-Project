@@ -74,7 +74,7 @@ const AllSellers = () => {
         renderCell: (params) => {
           return (
             <>
-            <Link to={`/shop/preview/${params.id}`}>
+            <Link to={`/shop/preview/${params?.id}`}>
             <Button>
                 <AiOutlineEye size={20} />
               </Button>
@@ -125,6 +125,7 @@ const AllSellers = () => {
             pageSize={10}
             disableSelectionOnClick
             autoHeight
+            rowsPerPageOptions={[10, 20, 30]}
           />
         </div>
         {open && (

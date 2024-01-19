@@ -235,7 +235,7 @@ export const categoriesData = [
     id: 7,
     title: "Pet Care",
     subTitle: "",
-    image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
+    image_Url: "https://img.freepik.com/free-photo/close-up-veterinarian-taking-care-pet_23-2149143877.jpg?size=626&ext=jpg&ga=GA1.1.262039400.1705675838&semt=ais",
   },
   {
     id: 8,

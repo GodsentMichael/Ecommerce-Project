@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 const CreateProduct = () => {
   const { seller } = useSelector((state) => state.seller);
   const { success, error } = useSelector((state) => state.products);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -22,15 +23,18 @@ const CreateProduct = () => {
   const [stock, setStock] = useState();
 
   useEffect(() => {
+    // Clear success state when component mounts
+    dispatch({ type: "CREATE_PRODUCT_CLEAR_SUCCESS" });
+  
     if (error) {
       toast.error(error);
     }
     if (success) {
       toast.success("Product created successfully!");
       navigate("/dashboard");
-      window.location.reload();
     }
   }, [dispatch, error, success]);
+  
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -49,36 +53,45 @@ const CreateProduct = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const newForm = new FormData();
-
-    images.forEach((image) => {
-      newForm.set("images", image);
-    });
-    newForm.append("name", name);
-    newForm.append("description", description);
-    newForm.append("category", category);
-    newForm.append("tags", tags);
-    newForm.append("originalPrice", originalPrice);
-    newForm.append("discountPrice", discountPrice);
-    newForm.append("stock", stock);
-    newForm.append("shopId", seller._id);
-    dispatch(
-      createProduct({
-        name,
-        description,
-        category,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId: seller._id,
-        images,
-      })
-    );
+  
+    try {
+      setIsLoading(true);
+  
+      const newForm = new FormData();
+  
+      images.forEach((image) => {
+        newForm.set("images", image);
+      });
+      newForm.append("name", name);
+      newForm.append("description", description);
+      newForm.append("category", category);
+      newForm.append("tags", tags);
+      newForm.append("originalPrice", originalPrice);
+      newForm.append("discountPrice", discountPrice);
+      newForm.append("stock", stock);
+      newForm.append("shopId", seller._id);
+      await dispatch(
+        createProduct({
+          name,
+          description,
+          category,
+          tags,
+          originalPrice,
+          discountPrice,
+          stock,
+          shopId: seller._id,
+          images,
+        })
+      );
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false); 
+    }
   };
+  
 
   return (
     <div className="w-[90%] 800px:w-[50%] bg-white  shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
@@ -215,11 +228,12 @@ const CreateProduct = () => {
               ))}
           </div>
           <br />
-          <div>
+         
+ <div>
             <input
               type="submit"
-              value="Create"
-              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={isLoading ? "Creating product pls wait..." : "Create"}
+              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-blue-400"
             />
           </div>
         </div>

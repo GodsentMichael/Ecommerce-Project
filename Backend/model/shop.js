@@ -53,7 +53,11 @@ const shopSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  transections: [
+  products: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+  }],
+  transactions: [
     {
       amount: {
         type: Number,

@@ -9,6 +9,7 @@ import { createevent } from "../../redux/actions/event";
 const CreateEvent = () => {
   const { seller } = useSelector((state) => state.seller);
   const { success, error } = useSelector((state) => state.events);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -28,7 +29,7 @@ const CreateEvent = () => {
     const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
     setStartDate(startDate);
     setEndDate(null);
-    document.getElementById("end-date").min = minEndDate.toISOString.slice(
+    document.getElementById("end-date").min = minEndDate.toISOString().slice(
       0,
       10
     );
@@ -75,28 +76,38 @@ const CreateEvent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newForm = new FormData();
+    // SET ISLOADING TO TRUE TO PREVENT MULTIPLE SUBMISSIONS
+    setIsLoading(true);
 
-    images.forEach((image) => {
-      newForm.append("images", image);
-    });
-    const data = {
-      name,
-      description,
-      category,
-      tags,
-      originalPrice,
-      discountPrice,
-      stock,
-      images,
-      shopId: seller._id,
-      start_Date: startDate?.toISOString(),
-      Finish_Date: endDate?.toISOString(),
-    };
-    dispatch(createevent(data));
+    try{
+      const newForm = new FormData();
+
+      images.forEach((image) => {
+        newForm.append("images", image);
+      });
+      const data = {
+        name,
+        description,
+        category,
+        tags,
+        originalPrice,
+        discountPrice,
+        stock,
+        images,
+        shopId: seller._id,
+        start_Date: startDate?.toISOString(),
+        Finish_Date: endDate?.toISOString(),
+      };
+      await dispatch(createevent(data));
+    }catch(error){
+      toast.error(error.message);
+    }finally{
+      setIsLoading(false);
+    }
+ 
   };
 
   return (
@@ -266,11 +277,12 @@ const CreateEvent = () => {
               ))}
           </div>
           <br />
-          <div>
+         
+ <div>
             <input
               type="submit"
-              value="Create"
-              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={isLoading ? "Creating event pls wait..." : "Create"}
+              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-blue-400"
             />
           </div>
         </div>

@@ -42,7 +42,7 @@ const Sponsored = () => {
         </div>
         <div className="flex items-start">
           <img
-            src="src/assetss/abamade_logo.png"
+            src="https://res.cloudinary.com/dye76dtzn/image/upload/v1705673523/jxig1wlq8j36t6ic80am.png"
             style={{ width: "150px", objectFit: "contain" }}
             alt=""
           />

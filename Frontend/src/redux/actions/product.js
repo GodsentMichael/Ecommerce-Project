@@ -2,49 +2,32 @@ import axios from "axios";
 import { server } from "../../server";
 
 // create product
-export const createProduct =
-  (
-    name,
-    description,
-    category,
-    tags,
-    originalPrice,
-    discountPrice,
-    stock,
-    shopId,
-    images
-  ) =>
-  async (dispatch) => {
-    try {
-      dispatch({
-        type: "productCreateRequest",
-      });
 
-      const { data } = await axios.post(
-        `${server}/product/create-product`,
-        name,
-        description,
-        category,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId,
-        images,
-      );
-      dispatch({
-        type: "productCreateSuccess",
-        payload: data.product,
-      });
-    } catch (error) {
-      dispatch({
-        type: "productCreateFail",
-        payload: error.response.data.message,
-      });
-    }
-  };
+export const createProduct = (productData) => async (dispatch) => {
+  try {
+    dispatch({
+      type: "CREATE_PRODUCT_REQUEST",
+    });
 
-// get All Products of a shop
+    const { data } = await axios.post(
+      `${server}/product/create-product`,
+      productData
+    );
+
+    dispatch({
+      type: "CREATE_PRODUCT_SUCCESS",
+      payload: data.product,
+    });
+  } catch (error) {
+    dispatch({
+      type: "CREATE_PRODUCT_FAIL",
+      payload: error.response.data.message,
+    });
+  }
+};
+
+
+// get a Product of a shop
 export const getAllProductsShop = (id) => async (dispatch) => {
   try {
     dispatch({
@@ -54,6 +37,7 @@ export const getAllProductsShop = (id) => async (dispatch) => {
     const { data } = await axios.get(
       `${server}/product/get-all-products-shop/${id}`
     );
+
     dispatch({
       type: "getAllProductsShopSuccess",
       payload: data.products,
@@ -65,6 +49,7 @@ export const getAllProductsShop = (id) => async (dispatch) => {
     });
   }
 };
+
 
 // delete product of a shop
 export const deleteProduct = (id) => async (dispatch) => {

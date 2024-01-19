@@ -37,7 +37,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 sm:gird-cols-3 lg:grid-cols-4 gap-6 sm:px-8 px-5 py-16 sm:text-center">
         <ul className="px-5 text-center sm:text-start flex sm:block flex-col items-center">
           <img
-            src="/src/assetss/shop-logo.png"
+            src="https://res.cloudinary.com/dye76dtzn/image/upload/v1705674191/d3gqcvlkri6zbmexz3ek.png"
             alt=""
             style={{  height: "70px" }}
           />
@@ -45,7 +45,7 @@ const Footer = () => {
           <p>The multi-vendor store to buy and sell beautiful products.</p>
           <div className="flex items-center mt-[15px]">
             <AiFillFacebook size={25} className="cursor-pointer" />
-            <img src="/src/assetss/twitterNewLogo.png" alt="twitter" style={{ marginLeft: "15px", cursor: "pointer", height:"20px" }}/>
+            <img src="https://res.cloudinary.com/dye76dtzn/image/upload/v1705674444/xiah9fovlctqrtbd5gqa.png" alt="twitter" style={{ marginLeft: "15px", cursor: "pointer", height:"20px" }}/>
             <AiFillInstagram
               size={25}
               style={{ marginLeft: "15px", cursor: "pointer" }}
@@ -107,7 +107,7 @@ const Footer = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10
          text-center pt-2 text-gray-400 text-sm pb-8"
       >
-        <span>© 2023 Godsent Stores. All rights reserved.</span>
+        <span>© 2024 Godsent Stores. All rights reserved.</span>
         <span>Terms · Privacy Policy</span>
         <div className="sm:block flex items-center justify-center w-full">
           <img
