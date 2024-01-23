@@ -8,35 +8,3 @@
         {"src":"/(.*)","dest":"/server.js"}
     ]
 }
-
-npm WARN deprecated @material-ui/data-grid@4.0.0-alpha.37: The name of the package has changed, more details in https://github.com/mui-org/material-ui-x/releases/tag/v4.0.0
-npm WARN deprecated @material-ui/styles@4.11.5: Material UI v4 doesn't receive active development since September 2021. See the guide https://mui.com/material-ui/migration/migration-v4/ to upgrade to v5.
-npm WARN deprecated core-js@2.6.12: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of 
-core-js.
-npm WARN deprecated @material-ui/core@4.12.4: Material UI v4 doesn't receive active development since September 2021. See the guide https://mui.com/material-ui/migration/migration-v4/ to upgrade to v5.
-
-added 416 packages, and audited 417 packages in 3m    
-
-108 packages are looking for funding
-  run `npm fund` for details
-
-1 moderate severity vulnerability
-
-To address all issues, run:
-  npm audit fix
-
-Run `npm audit` for details.
-
-Godsent Michael@DESKTOP-9EEVN42 MINGW64 ~/Documents/GitHub/Ecommerce-Project/frontend (main)
-$ npm run dev
-
-> vite-project@0.0.0 dev
-> vite --host 0.0.0.0
-
-
-  VITE v4.3.9  ready in 2889 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: http://192.168.56.1:5173/
-  ➜  Network: http://192.168.0.178:5173/
-  ➜  press h to show help
